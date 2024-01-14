@@ -8,13 +8,10 @@ class Rtuple
 public:
     int u, v;
     int tMinus, tPlus;
-    int w = -1;
+    
 
     // Construtor para contato sem peso
     Rtuple(int u, int v, int tM, int tP) : u(u), v(v), tMinus(tM), tPlus(tP) {}
-
-    // Construtor para contato com peso
-    Rtuple(int u, int v, int tM, int tP, int w) : u(u), v(v), tMinus(tM), tPlus(tP), w(w) {}
 
     // Operador de comparação para ordenação (<)
     bool operator<(const Rtuple &other) const
@@ -101,7 +98,7 @@ public:
         }
     }
 
-    // Retorna vizinhos de saída de um nó
+    // Retorna vizinhos de saída de um nó [u][x]
     auto neighboursOut(int u)
     {
         set<int> nout;
@@ -118,7 +115,7 @@ public:
         return nout;
     }
 
-    // Retorna vizinhos de entrada de um nó
+    // Retorna vizinhos de entrada de um nó [x][u]
     auto neighboursIn(int u)
     {
         set<int> nin;
