@@ -3,7 +3,8 @@
 using namespace std;
 
 // Classe para representar um contato temporal entre nós no grafo
-class Rtuple {
+class Rtuple
+{
 public:
     int u, v;
     int tMinus, tPlus;
@@ -15,95 +16,99 @@ public:
     // Construtor para contato com peso
     Rtuple(int u, int v, int tM, int tP, int w) : u(u), v(v), tMinus(tM), tPlus(tP), w(w) {}
 
-    // Função para verificar se este contato inclui outro
-    bool includes(const Rtuple other) const {
-        if (u == other.u && v == other.v) {
-            if (other.tMinus <= tMinus && tPlus <= other.tPlus) {
-                return true;
-            } else {
-                return false;
-            }
-        } else {
-            return false;
-        }
-        // Alternativamente:
-        // return this->u == other.u && this->v == other.v && this->tMinus == other.tMinus && this->tPlus == other.tPlus;
-    }
-
     // Operador de comparação para ordenação (<)
-    bool operator<(const Rtuple& other) const {
-        return tPlus < other.tPlus;
+    bool operator<(const Rtuple &other) const
+    {
+        if (tMinus != other.tMinus)
+        {
+            return tMinus < other.tMinus;
+        }
+        else
+        {
+            return tPlus < other.tPlus;
+        }
+    };
+    // Operador de comparação para ordenação (<=)
+    bool operator<=(const Rtuple &other) const
+    {
+        if (tMinus != other.tMinus)
+        {
+            return tMinus <= other.tMinus;
+        }
+        else
+        {
+            return tPlus <= other.tPlus;
+        }
+    };
+
+    bool operator!=(const Rtuple &other) const
+    {
+        return tMinus != other.tMinus or tPlus != other.tPlus;
     }
 
-    // Operador de comparação para ordenação (<=)
-    bool operator<=(const Rtuple& other) const {
-        return tPlus <= other.tPlus;
+    bool operator==(const Rtuple &other) const
+    {
+        return tMinus == other.tMinus or tPlus == other.tPlus;
+    }
+
+    bool contains(Rtuple other1, Rtuple other2)
+    {
+        if (!other1.not_empty())
+        {
+            return false; //(Tplus >= other2.Tminus);
+        }
+        else if (!other2.not_empty())
+        {
+            return (tMinus >= other1.tMinus);
+        }
+
+        return (tMinus >= other1.tMinus && tPlus <= other2.tPlus);
     }
 
     // Verifica se o contato não está vazio
-    bool not_empty() {
-        if(tPlus != -1 or tMinus != -1) {
-            //cout<< " naoVazio - "<<u<<v<<tMinus<<tPlus<< " ";
-            return true;
-        }
-        //cout<<" vazio";
-        return false;
-    }
-};
-
-// Classe para representar um nó em um tempo específico
-class nodeTime {
-public:
-    int node, time, sucessor;
-
-    // Construtor para nó sem sucessor
-    nodeTime(int node, int time) : node(node), time(time) {}
-
-    // Construtor para nó com sucessor
-    nodeTime(int node, int time, int sucessor) : node(node), time(time), sucessor(sucessor) {}
-
-    // Operador de comparação para ordenação
-    bool operator<(const nodeTime &nt) const {
-        if (node != nt.node)
-            return node < nt.node;
-        else
-            return time < nt.time;
-    }
-
-    // Operador de comparação para igualdade
-    bool operator==(const nodeTime &nt) const {
-        return (node == nt.node && time == nt.time);
+    bool not_empty()
+    {
+        return tPlus != -1 or tMinus != -1;
     }
 };
 
 // Classe principal para representar o Grafo Temporal
-class TemporalGraph {
+class TemporalGraph
+{
 public:
     int V;
     vector<vector<set<Rtuple>>> Treeset; // Matriz de árvores (conjuntos) de Rtuple
     int delta = 1;
 
     // Construtor para inicializar o grafo com um número de nós dado
-    TemporalGraph(int x) : V(x) {
+    TemporalGraph(int x) : V(x)
+    {
         Treeset.resize(x, vector<set<Rtuple>>(x));
     }
 
-    //lida com entradas de u e v (int ou char)
-    int get_node_index(const std::string& node_str) const {
-            if (node_str.length() == 1 && isalpha(node_str[0])) {
-                // Se for um único caractere alfabético (como 'a', 'b', etc.)
-                return node_str[0] - 'a';
-            } else {
-                // Caso contrário, assume que é um número inteiro
-                return std::stoi(node_str);
-            }
+    // lida com entradas de u e v (int ou char)
+    int get_node_index(const std::string &node_str) const
+    {
+        if (node_str.length() == 1 && isalpha(node_str[0]))
+        {
+            // Se for um único caractere alfabético (como 'a', 'b', etc.)
+            return node_str[0] - 'a';
         }
+        else
+        {
+            // Caso contrário, assume que é um número inteiro
+            return std::stoi(node_str);
+        }
+    }
 
     // Retorna vizinhos de saída de um nó
-    auto neighboursOut(int u) {
+    auto neighboursOut(int u)
+    {
         set<int> nout;
-        for (int j = 0; j < V; j++) {
-            for (const Rtuple &r : Treeset[u][j]) {
+        for (int j = 0; j < V; j++)
+        {
+            for (const Rtuple &r : Treeset[u][j])
+            {
                 if (r.u == u)
                     nout.insert(r.v);
                 else
@@ -114,13 +119,19 @@ public:
     }
 
     // Retorna vizinhos de entrada de um nó
-    auto neighboursIn(int u) {
+    auto neighboursIn(int u)
+    {
         set<int> nin;
-        for (int j = 0; j < V; j++) {
-            for (const Rtuple &r : Treeset[j][u]) {
-                if (r.v == u) {
+        for (int j = 0; j < V; j++)
+        {
+            for (const Rtuple &r : Treeset[j][u])
+            {
+                if (r.v == u)
+                {
                     nin.insert(r.u);
-                } else {
+                }
+                else
+                {
                     nin.insert(r.v);
                 }
             }
@@ -129,109 +140,168 @@ public:
     }
 
     // Adiciona um novo contato temporal ao conjunto correspondente
-void INSERT(int u, int v, int tMinus, int tPlus, int w) {
-    std::set<Rtuple>& Tuv = Treeset[u][v];
-    Rtuple newtuple(u, v, tMinus, tPlus);
+    void INSERT(int u, int v, int tMinus, int tPlus)
+    {
+        Rtuple newTuple(u, v, tMinus, tPlus);
 
-    if (Tuv.empty()) {
-        Tuv.insert(newtuple);
-        return;
-    }
+        if (Treeset[u][v].empty())
+        {
+            set<Rtuple> newSet = {newTuple};
+            Treeset[u][v] = newSet;
+        }
+        else
+        {
+            // Removendo redundâncias
+            // Encontrando o limite inferior l1
+            auto l1 = find_prev(u, v, tPlus);
+            if (l1.tPlus < tPlus)
+            {
+                if (l1.tMinus >= tMinus)
+                { // t1 t2
+                    return;
+                }
+                else
+                {
+                    l1 = find_next(u, v, l1.tPlus);
+                }
+            }
 
-    // FIXME: the following code is inefficient... it's just made to work
-    std::set<Rtuple>::iterator it = Tuv.lower_bound(newtuple);
+            // Encontrando o limite superior l2
+            auto l2 = find_next(u, v, tMinus);
 
-    if (it != Tuv.end() && *it <= newtuple) {
-        return;
-    }
+            if (l2.not_empty() and l2.tMinus > tMinus)
+            {
+                l2 = find_prev(u, v, l2.tPlus);
+            }
 
-    std::set<Rtuple> toBeRemoved;
+            // Verificando se l1 e l2 são valores aceitáveis
 
-    Rtuple inf = find_prev(u, v, tPlus);
+            set<Rtuple>::iterator it1, it2;
 
-    if (inf.tPlus == -1) {
-        it = Tuv.begin();
-        inf = *it;
-    }
+            if (!l1.not_empty())
+            {
+                it1 = Treeset[u][v].end();
+            }
+            else
+            {
+                it1 = Treeset[u][v].find(l1);
+            }
 
-    for (; it != Tuv.end() && it->tPlus <= tPlus; ++it) {
-        if (it->tMinus <= tPlus && it->includes(newtuple)) {
-            toBeRemoved.insert(*it);
+            if (!l2.not_empty())
+            {
+                it2 = Treeset[u][v].end();
+            }
+            else
+            {
+                it2 = Treeset[u][v].find(l2);
+            }
+
+            // Conjunto temporário para armazenar elementos a serem removidos
+            set<Rtuple> elementsToRemove;
+
+            while (it1 != it2)
+            {
+                // Armazena o elemento em elementsToRemove em vez de removê-lo diretamente
+                auto elem = *it1;
+                if (elem.contains(l1, l2))
+                {
+                    elementsToRemove.insert(elem);
+                }
+
+                ++it1;
+            }
+
+            // Agora, remova os elementos do conjunto
+            for (auto elem : elementsToRemove)
+            {
+                Treeset[u][v].erase(elem);
+            }
+            Treeset[u][v].insert(newTuple);
         }
     }
-
-    for (const Rtuple& r : toBeRemoved) {
-        Tuv.erase(r);
-    }
-
-    Tuv.insert(newtuple);
-}
-
 
     // Encontra o contato temporal anterior em relação a um tempo especificado
-    Rtuple find_prev(int u, int v, int t) {
-        set<Rtuple> &Tuv = Treeset[u][v];
-        Rtuple inf(u, v, -1, t);
-        set<Rtuple>::iterator it = Tuv.lower_bound(inf);
-        if (it == Tuv.begin()) {
-            return Rtuple(u, v, -1, -1);
-        } else {
-            return *it;
+    Rtuple find_prev(int u, int v, int t)
+    {
+        set<Rtuple> tuplas = Treeset[u][v];
+        Rtuple latest(u, v, -1, -1);
+
+        for (const auto &tupla : tuplas)
+        {
+            if (tupla.tPlus <= t)
+            {
+                latest = tupla;
+            }
         }
+        return latest;
     };
 
     // Encontra o próximo contato temporal em relação a um tempo especificado
-    Rtuple find_next(int u, int v, int t) {
+    Rtuple find_next(int u, int v, int t)
+    {
         set<Rtuple> &Tuv = Treeset[u][v];
-        Rtuple inf(u, v, -1, t);
-        set<Rtuple>::iterator it = Tuv.upper_bound(inf);
-        if (it == Tuv.end()) {
+        Rtuple inf(u, v, t, -1);
+        set<Rtuple>::iterator it = Tuv.lower_bound(inf);
+        if (it == Tuv.end())
+        {
             return Rtuple(u, v, -1, -1);
-        } else {
+        }
+        else
+        {
             return *it;
         }
     };
 
     // Verifica se é possível alcançar um nó de outro em um intervalo de tempo
-    bool can_reach(string u_str, string v_str, int t1, int t2) {
+    bool can_reach(string u_str, string v_str, int t1, int t2)
+    {
         int u = get_node_index(u_str);
         int v = get_node_index(v_str);
-        auto prev = find_next(u, v, t1);
-        if (prev.not_empty() and prev.tPlus <= t2) {
+        set<Rtuple> tuplas = Treeset[u][v];
+        Rtuple next = find_next(u, v, t1);
+        Rtuple prev = find_prev(u, v, t2);
+        if ((next.not_empty() && next.tPlus <= t2) || (prev.not_empty() && prev.tPlus >= t1))
+        {
             return true;
-        } else {
-            return false;
         }
+        return false;
     };
 
     // Adiciona um contato entre dois nós em um tempo específico
-    void add_contact(string u_str, string v_str, int time) {
+    void add_contact(string u_str, string v_str, int time)
+    {
         int u = get_node_index(u_str);
         int v = get_node_index(v_str);
-        INSERT(u, v, time, time + delta, v);
-
-        set<nodeTime> D;
-
-        for (int wMinus : neighboursIn(u)) {
-            Rtuple prevRtuple = find_prev(wMinus, u, time);
-            if (prevRtuple.not_empty()) {
-                INSERT(wMinus, v, prevRtuple.tMinus, time + delta, prevRtuple.w);
-                D.insert(nodeTime(wMinus, prevRtuple.tMinus, prevRtuple.w));
+        INSERT(u, v, time, time + delta);
+        set<pair<int, int>> aux;
+        set<int> neigh_a = neighboursIn(u);
+        set<int> neigh_b = neighboursOut(v);
+        // Neighbors in
+        for (auto x : neigh_a)
+        {
+            Rtuple prev = find_prev(x, u, time);
+            if (prev.not_empty())
+            {
+                INSERT(x, v, prev.tMinus, time + delta);
+                aux.insert({x, prev.tMinus});
             }
         }
-
-        for (int wPlus : neighboursOut(v)) {
-            Rtuple next = find_next(v, wPlus, time + delta);
-
-            if (next.not_empty()) {
-                INSERT(u, wPlus, time, next.tPlus, v);
-
-                for (nodeTime p : D) {
-                    int wMinus = p.node;
-                    int tMinus = p.time;
-                    int successor = p.sucessor;
-                    if (wMinus != wPlus) {
-                        INSERT(wMinus, wPlus, tMinus, next.tPlus, successor);
+        // Neighbors out
+        for (auto x : neigh_b)
+        {
+            Rtuple next = find_next(v, x, time + delta);
+            if (next.tMinus > time + 1)
+            {
+                next = Rtuple(v, x, -1, -1);
+            };
+            if (next.not_empty())
+            {
+                INSERT(u, x, time, next.tPlus);
+                for (auto tupla : aux)
+                {
+                    if (tupla.first != x)
+                    {
+                        INSERT(tupla.first, x, tupla.second, next.tPlus);
                     }
                 }
             }
@@ -239,34 +309,46 @@ void INSERT(int u, int v, int tMinus, int tPlus, int w) {
     }
 
     // Imprime o estado atual das árvores temporais
-    void printTTC() {
+    void printTTC()
+    {
         int a = 0, b = 0;
-        for (auto x : Treeset) {
-            for (auto y : x) {
-                cout << "TreeSet[" << a << "][" << b << "] = ";
-                for (auto k : y) {
-                    cout << "(" << k.u << ", " << k.v << ", " << k.tMinus << ", " << k.tPlus << ") - ";
+        for (auto x : Treeset)
+        {
+            if (!x.empty())
+            {
+                for (auto y : x)
+                {
+                    if (!y.empty())
+                    {
+                        cout << "TreeSet[" << a << "][" << b << "] = ";
+                        for (auto k : y)
+                        {
+                            cout << "(" << k.tMinus << ", " << k.tPlus << ") - ";
+                        }
+
+                        cout << "\n";
+                    }
+                    b++;
                 }
-                b++;
-                cout << "\n";
+                a++;
+                b = 0;
             }
-            a++;
-            b = 0;
         }
     }
 };
 
 // Função principal
-
-int main(int argc, char const *argv[]) {
+int main(int argc, char const *argv[])
+{
     // Nome do arquivo a ser lido
-    std::string nomeArquivo = "02.in";
+    std::string nomeArquivo = "teste.in";
 
     // Abre o arquivo
     std::ifstream arquivo(nomeArquivo);
 
     // Verifica se o arquivo foi aberto com sucesso
-    if (!arquivo.is_open()) {
+    if (!arquivo.is_open())
+    {
         std::cerr << "Erro ao abrir o arquivo." << std::endl;
         return 1; // Retorna 1 para indicar erro
     }
@@ -282,27 +364,35 @@ int main(int argc, char const *argv[]) {
     TemporalGraph teste(numeroDeVertices);
 
     // Lê e exibe cada linha restante do arquivo
-    while (std::getline(arquivo, linha)) {
+    while (std::getline(arquivo, linha))
+    {
         std::istringstream ss(linha);
         std::string comando, u, v;
         ss >> comando;
 
-        if (comando == "add") {
+        if (comando == "add")
+        {
             // Comando de adicionar contato
             int t;
             ss >> u >> v >> t;
             teste.add_contact(u, v, t);
-           // teste.add_contact(v,u,t);
-        } else if (comando == "can_reach") {
+        }
+        else if (comando == "can_reach")
+        {
             // Comando de verificar se é possível alcançar
             int t1, t2;
             ss >> u >> v >> t1 >> t2;
-            if (teste.can_reach(u, v, t1, t2)) {
+            if (teste.can_reach(u, v, t1, t2))
+            {
                 std::cout << "true" << std::endl;
-            } else {
+            }
+            else
+            {
                 std::cout << "false" << std::endl;
             }
-        } else {
+        }
+        else
+        {
             std::cout << "Comando inválido." << std::endl;
         }
     }
