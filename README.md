@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # Grafos Temporais Dinâmicos: Estruturas de Fechamento Transitivo Temporal (TTC) Sob Análise
 
 ## Visão Geral
@@ -34,3 +35,4 @@ Ambas as implementações apresentam tempos de resposta eficientes para consulta
 ## Contexto da Pesquisa
 
 Este projeto faz parte de uma pesquisa em andamento sobre grafos temporais dinâmicos, explorando aplicações em diversos campos, como redes de comunicação e epidemiologia. O objetivo é contribuir para a compreensão e o gerenciamento eficiente de interações temporais entre entidades ao longo do tempo.
+=======
