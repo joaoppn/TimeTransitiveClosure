@@ -1,5 +1,5 @@
 
-# Grafos Temporais Dinâmicos: Estruturas de Fechamento Transitivo Temporal (TTC) Sob Análise
+# Grafos Temporais Dinâmicos: Timed Transitive Closure (TTC) 
 
 ## Visão Geral
 
