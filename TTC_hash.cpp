@@ -210,7 +210,7 @@ public:
 
             set<RTuple, SetCompare> elementsToRemove;
 
-            while (it1 != it2)
+            while (it1 != it2 and it1 != hashTable[{a, b}].end());
             {
                 auto elem = *it1;
                 if (elem.contains(l1, l2))

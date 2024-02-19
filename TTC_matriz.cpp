@@ -196,7 +196,7 @@ public:
             // Conjunto temporário para armazenar elementos a serem removidos
             set<Rtuple> elementsToRemove;
 
-            while (it1 != it2)
+            while (it1 != it2 and it1 != Treeset[u][v].end())
             {
                 // Armazena o elemento em elementsToRemove em vez de removê-lo diretamente
                 auto elem = *it1;
